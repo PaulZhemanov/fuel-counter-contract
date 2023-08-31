@@ -7,10 +7,13 @@ authors = ["master"]
 license = "Apache-2.0"
 
 [dev-dependencies]
-fuels = { version = "0.41", features = ["fuel-core-lib"] }
+fuels = { version = "0.47", features = ["fuel-core-lib"] }
 tokio = { version = "1.12", features = ["rt", "macros"] }
 
 [[test]]
 harness = true
 name = "integration_tests"
 path = "tests/harness.rs"
+
+[dependencies]
+dotenv = "0.15.0"

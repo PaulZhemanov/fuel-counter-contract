@@ -4,13 +4,13 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.38.0
-  Forc version: 0.35.5
-  Fuel-Core version: 0.17.3
+  Fuels version: 0.54.0
+  Forc version: 0.44.0
+  Fuel-Core version: 0.20.4
 */
 
-import { Interface, Contract } from "fuels";
-import type { Provider, Account, AbstractAddress } from "fuels";
+import { Interface, Contract, ContractFactory } from "fuels";
+import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptions } from "fuels";
 import type { CounterContractAbi, CounterContractAbiInterface } from "../CounterContractAbi";
 
 const _abi = {
@@ -23,6 +23,75 @@ const _abi = {
     },
     {
       "typeId": 1,
+      "type": "b256",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 2,
+      "type": "enum Identity",
+      "components": [
+        {
+          "name": "Address",
+          "type": 3,
+          "typeArguments": null
+        },
+        {
+          "name": "ContractId",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 3,
+      "type": "struct Address",
+      "components": [
+        {
+          "name": "value",
+          "type": 1,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 4,
+      "type": "struct ContractId",
+      "components": [
+        {
+          "name": "value",
+          "type": 1,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 5,
+      "type": "struct IncrementParams",
+      "components": [
+        {
+          "name": "caller",
+          "type": 2,
+          "typeArguments": null
+        },
+        {
+          "name": "counter",
+          "type": 6,
+          "typeArguments": null
+        },
+        {
+          "name": "timestamp",
+          "type": 6,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 6,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -34,7 +103,7 @@ const _abi = {
       "name": "count",
       "output": {
         "name": "",
-        "type": 1,
+        "type": 6,
         "typeArguments": null
       },
       "attributes": [
@@ -65,7 +134,16 @@ const _abi = {
       ]
     }
   ],
-  "loggedTypes": [],
+  "loggedTypes": [
+    {
+      "logId": 0,
+      "loggedType": {
+        "name": "",
+        "type": 5,
+        "typeArguments": []
+      }
+    }
+  ],
   "messagesTypes": [],
   "configurables": []
 }
@@ -80,5 +158,14 @@ export class CounterContractAbi__factory {
     accountOrProvider: Account | Provider
   ): CounterContractAbi {
     return new Contract(id, _abi, accountOrProvider) as unknown as CounterContractAbi
+  }
+  static async deployContract(
+    bytecode: BytesLike,
+    wallet: Account,
+    options: DeployContractOptions = {}
+  ): Promise<CounterContractAbi> {
+    const factory = new ContractFactory(bytecode, _abi, wallet);
+    const contract = await factory.deployContract(options);
+    return contract as unknown as CounterContractAbi;
   }
 }

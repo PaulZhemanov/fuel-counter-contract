@@ -1,4 +1,6 @@
-use fuels::{prelude::*, tx::ContractId};
+use std::str::FromStr;
+
+use fuels::prelude::*;
 
 // Load abi from json
 abigen!(Contract(
@@ -6,40 +8,30 @@ abigen!(Contract(
     abi = "out/debug/counter-contract-abi.json"
 ));
 
-async fn get_contract_instance() -> (Counter<WalletUnlocked>, ContractId) {
-    // Launch a local network and deploy the contract
-    let mut wallets = launch_custom_provider_and_get_wallets(
-        WalletsConfig::new(
-            Some(1),             /* Single wallet */
-            Some(1),             /* Single coin (UTXO) */
-            Some(1_000_000_000), /* Amount per coin */
-        ),
-        None,
-        None,
-    )
-    .await;
-    let wallet = wallets.pop().unwrap();
+const RPC: &str = "beta-4.fuel.network";
 
-    let id = Contract::load_from(
-        "./out/debug/counter-contract.bin",
-        LoadConfiguration::default(),
-    )
-    .unwrap()
-    .deploy(&wallet, TxParameters::default())
-    .await
-    .unwrap();
-
-    let instance = Counter::new(id.clone(), wallet);
-
-    (instance, id.into())
-}
+const COUNTER_ADDRESS: &str = "0xce3dddd28c0c6c1cb4a4241943dcfcad6bed6657e659f1a97a7ab2b7b49c3216";
 
 #[tokio::test]
 async fn can_get_contract_id() {
-    let (instance, _id) = get_contract_instance().await;
-    let count = instance.methods().count().simulate().await.unwrap().value;
-    assert!(count == 0);
-    instance.methods().increment().call().await.unwrap();
-    let count = instance.methods().count().simulate().await.unwrap().value;
-    assert!(count == 1);
+    dotenv::dotenv().ok();
+    let provider = Provider::connect(RPC).await.unwrap();
+    let secret = std::env::var("ADMIN").unwrap();
+    let wallet =
+        WalletUnlocked::new_from_private_key(secret.parse().unwrap(), Some(provider.clone()));
+
+    let id = ContractId::from_str(COUNTER_ADDRESS).unwrap();
+    let instance = Counter::new(id, wallet.clone());
+
+    instance
+        .methods()
+        .increment()
+        .tx_params(TxParameters::default().with_gas_price(1))
+        .call()
+        .await
+        .unwrap();
+
+    let counter = instance.methods().count().simulate().await.unwrap().value;
+
+    println!("counter = {counter}");
 }

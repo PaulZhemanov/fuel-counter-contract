@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.38.0
-  Forc version: 0.35.5
-  Fuel-Core version: 0.17.3
+  Fuels version: 0.54.0
+  Forc version: 0.44.0
+  Fuel-Core version: 0.20.4
 */
 
 import type {
@@ -19,6 +19,18 @@ import type {
   Interface,
   InvokeFunction,
 } from 'fuels';
+
+import type { Enum } from "./common";
+
+export type IdentityInput = Enum<{ Address: AddressInput, ContractId: ContractIdInput }>;
+export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: ContractIdOutput }>;
+
+export type AddressInput = { value: string };
+export type AddressOutput = AddressInput;
+export type ContractIdInput = { value: string };
+export type ContractIdOutput = ContractIdInput;
+export type IncrementParamsInput = { caller: IdentityInput, counter: BigNumberish, timestamp: BigNumberish };
+export type IncrementParamsOutput = { caller: IdentityOutput, counter: BN, timestamp: BN };
 
 interface CounterContractAbiInterface extends Interface {
   functions: {
