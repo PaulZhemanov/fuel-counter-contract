@@ -1,17 +1,17 @@
 contract;
+mod events;
+mod structs;
+use events::*;
+use structs::*;
+
 use std::logging::log;
 use std::auth::msg_sender;
-struct IncrementParams {
-    caller: Identity,
-    counter: u64,
-    timestamp: u64,
-}
 
 storage {
-    counter: u64 = 0,
+    counter: Counter = Counter::default(),
 }
 
-abi Counter {
+abi CounterContract {
     #[storage(read, write)]
     fn increment();
 
@@ -19,20 +19,21 @@ abi Counter {
     fn count() -> u64;
 }
 
-impl Counter for Contract {
+impl CounterContract for Contract {
     #[storage(read)]
     fn count() -> u64 {
-        storage.counter.try_read().unwrap_or(0)
+        storage.counter.value.try_read().unwrap_or(0)
     }
 
     #[storage(read, write)]
     fn increment() {
-        let incremented = storage.counter.try_read().unwrap_or(0) + 1;
-        storage.counter.write(incremented);
-        log(IncrementParams {
+        let value = storage.counter.value.try_read().unwrap_or(0) + 1;
+        let counter = Counter {
+            value: value,
             caller: msg_sender().unwrap(),
-            counter: incremented,
             timestamp: std::block::timestamp(),
-        });
+        };
+        storage.counter.write(counter);
+        log(IncrementEvent {counter});
     }
 }
