@@ -1,8 +1,8 @@
 contract;
-mod events;
 mod structs;
-use events::*;
+mod events;
 use structs::*;
+use events::*;
 
 use std::logging::log;
 use std::auth::msg_sender;
