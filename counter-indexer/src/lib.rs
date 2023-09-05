@@ -10,14 +10,14 @@ pub mod counter_indexer_index_mod {
         info!("🧱 Block height: {height} | transacrions: {txs}");
     }
 
-    fn handle_increment_params(data: IncrementParams) {
-        Logger::info(format!("✨ IncrementParams: {:#?}", data).as_str());
-        let increment = Increment {
-            id: SizedAsciiString::try_from(data.counter.to_string()).unwrap(),
-            caller: data.caller,
-            counter: data.counter,
-            timestamp: data.timestamp,
-        };
-        increment.save();
-    }
+    // fn handle_increment_params(data: IncrementParams) {
+    //     Logger::info(format!("✨ IncrementParams: {:#?}", data).as_str());
+    //     let increment = Increment {
+    //         id: SizedAsciiString::try_from(data.counter.to_string()).unwrap(),
+    //         caller: data.caller,
+    //         counter: data.counter,
+    //         timestamp: data.timestamp,
+    //     };
+    //     increment.save();
+    // }
 }
